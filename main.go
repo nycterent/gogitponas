@@ -52,6 +52,8 @@ func SendNotifications(MRRequests []gitlab.GitlabMergeInformation) {
 					},
 				})
 				break
+			case "slack":
+				break
 			}
 		}
 	}

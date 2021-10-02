@@ -5,9 +5,6 @@ SLACK_CHANNEL=#main-mr
 SLACK_HOOK=https://hooks.slack.com/services/etcetc
 SLACK_USERNAME=gogitponas
 
-ROCKET_CHANNEL=#Tests
 ROCKET_HOOK=
-ROCKET_TOKEN=
-
 
 NOTIFICATION_TARGETS=rocket,slack
