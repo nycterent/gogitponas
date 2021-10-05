@@ -2,6 +2,7 @@ package main
 
 import (
 	"gogitponas/gitlab"
+	"gogitponas/registry"
 	"gogitponas/rocketchat"
 	"log"
 	"os"
@@ -9,8 +10,6 @@ import (
 
 	"github.com/joho/godotenv"
 )
-
-var RocketChatClient *rocketchat.RocketChat
 
 func main() {
 
@@ -27,7 +26,6 @@ func main() {
 	// slack_channel := os.Getenv("SLACK_CHANNEL")
 
 	g := gitlab.New(gitlab_token, gitlab_url)
-	RocketChatClient = rocketchat.New(os.Getenv("ROCKET_HOOK"))
 
 	for _, project := range gitlab_projects {
 		SendNotifications(g.GetOldMergeRequests(project))
@@ -36,25 +34,12 @@ func main() {
 }
 
 func SendNotifications(MRRequests []gitlab.GitlabMergeInformation) {
-	notification_targets := strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ",")
+	notification_targets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
+
+	notification_targets.Register("slack", &Slack{})
+	notification_targets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"))})
+
 	for _, mr := range MRRequests {
-		for _, target := range notification_targets {
-			switch target {
-			case "rocket":
-				RocketChatClient.Send(rocketchat.RocketChatMessage{
-					Text: mr.Title,
-					Attachments: []rocketchat.RocketChatMessageAttachment{
-						rocketchat.RocketChatMessageAttachment{
-							Title:     mr.Reference,
-							TitleLink: mr.MRUrl,
-							Text:      mr.Author,
-						},
-					},
-				})
-				break
-			case "slack":
-				break
-			}
-		}
+		notification_targets.Send(mr)
 	}
 }
