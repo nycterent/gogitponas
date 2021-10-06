@@ -18,23 +18,23 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	gitlab_url := os.Getenv("GITLAB_URL")
-	gitlab_token := os.Getenv("GITLAB_TOKEN")
-	gitlab_projects := strings.Split(os.Getenv("GITLAB_PROJECTS"), ",")
+	gitlabURL := os.Getenv("GITLAB_URL")
+	gitlabToken := os.Getenv("GITLAB_TOKEN")
+	gitlabProjects := strings.Split(os.Getenv("GITLAB_PROJECTS"), ",")
 
 	// slack_hook := os.Getenv("SLACK_HOOK")
 	// slack_channel := os.Getenv("SLACK_CHANNEL")
 
-	g := gitlab.New(gitlab_token, gitlab_url)
+	g := gitlab.New(gitlabToken, gitlabURL)
 
-	notification_targets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
+	notificationTargets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
 
-	notification_targets.Register("slack", &Slack{})
-	notification_targets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"))})
+	notificationTargets.Register("slack", &Slack{})
+	notificationTargets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"))})
 
-	for _, project := range gitlab_projects {
+	for _, project := range gitlabProjects {
 		for _, mr := range g.GetOldMergeRequests(project) {
-			notification_targets.Send(mr)
+			notificationTargets.Send(mr)
 		}
 	}
 

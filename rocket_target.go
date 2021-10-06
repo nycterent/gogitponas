@@ -21,7 +21,7 @@ func (r Rocket) Send() {
 		Attachments: []rocketchat.RocketChatMessageAttachment{
 			{
 				Title:     r.gmi.Reference,
-				TitleLink: r.gmi.MRUrl,
+				TitleLink: r.gmi.MRURL,
 				Text:      r.gmi.Author,
 			},
 		},
