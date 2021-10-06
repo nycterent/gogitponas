@@ -27,19 +27,15 @@ func main() {
 
 	g := gitlab.New(gitlab_token, gitlab_url)
 
-	for _, project := range gitlab_projects {
-		SendNotifications(g.GetOldMergeRequests(project))
-	}
-
-}
-
-func SendNotifications(MRRequests []gitlab.GitlabMergeInformation) {
 	notification_targets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
 
 	notification_targets.Register("slack", &Slack{})
 	notification_targets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"))})
 
-	for _, mr := range MRRequests {
-		notification_targets.Send(mr)
+	for _, project := range gitlab_projects {
+		for _, mr := range g.GetOldMergeRequests(project) {
+			notification_targets.Send(mr)
+		}
 	}
+
 }
