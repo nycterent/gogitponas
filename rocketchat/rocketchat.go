@@ -8,19 +8,6 @@ import (
 	"net/http"
 )
 
-// {
-// 	"text": "Example message",
-// 	"attachments": [
-// 	  {
-// 		"title": "Rocket.Chat",
-// 		"title_link": "https://rocket.chat",
-// 		"text": "Rocket.Chat, the best open source chat",
-// 		"image_url": "http://images/integration-attachment-example.png",
-// 		"color": "#764FA5"
-// 	  }
-// 	]
-//   }
-
 type RocketChatMessage struct {
 	Text        string                        `json:"text"`
 	Attachments []RocketChatMessageAttachment `json:"attachments"`
@@ -49,7 +36,10 @@ func New(RHook string) *RocketChat {
 func (rc RocketChat) Send(message RocketChatMessage) error {
 	payloadBuf := new(bytes.Buffer)
 
-	json.NewEncoder(payloadBuf).Encode(message)
+	err := json.NewEncoder(payloadBuf).Encode(message)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	resp, err := rc.http.Post(rc.hook, "application/json", payloadBuf)
 

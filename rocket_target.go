@@ -4,6 +4,8 @@ import (
 	"gogitponas/gitlab"
 	"gogitponas/registry"
 	"gogitponas/rocketchat"
+
+	"log"
 )
 
 var _ registry.Callback = (*Rocket)(nil)
@@ -14,7 +16,7 @@ type Rocket struct {
 }
 
 func (r Rocket) Send() {
-	r.rc.Send(rocketchat.RocketChatMessage{
+	err := r.rc.Send(rocketchat.RocketChatMessage{
 		Text: r.gmi.Title,
 		Attachments: []rocketchat.RocketChatMessageAttachment{
 			{
@@ -24,6 +26,10 @@ func (r Rocket) Send() {
 			},
 		},
 	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
