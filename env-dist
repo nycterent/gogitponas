@@ -1,10 +1,9 @@
 GITLAB_URL=https://gitlaburl/
 GITLAB_PROJECTS=group/project1,group/project2
 GITLAB_TOKEN=marmalasuogiene
-SLACK_CHANNEL=#main-mr
-SLACK_HOOK=https://hooks.slack.com/services/etcetc
-SLACK_USERNAME=gogitponas
 
-ROCKET_HOOK=
+SLACK_HOOK=https://hooks.slack.com/services/etcetc
+
+ROCKET_HOOK=https://yourrocketchathook
 
 NOTIFICATION_TARGETS=rocket,slack
