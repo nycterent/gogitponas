@@ -3,6 +3,7 @@ package rocketchat
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,26 +23,22 @@ type RocketChatMessageAttachment struct {
 }
 
 type RocketChat struct {
-	hook string
+	hook   string
+	http   *http.Client
+	client RocketClientInterface
+}
+
+type RocketClientInterface interface {
+	Send(string, io.Reader) error
+}
+
+type RocketClient struct {
 	http *http.Client
 }
 
-func New(RHook string) *RocketChat {
-	return &RocketChat{
-		hook: RHook,
-		http: &http.Client{},
-	}
-}
+func (rc RocketClient) Send(hook string, body io.Reader) error {
 
-func (rc RocketChat) Send(message RocketChatMessage) error {
-	payloadBuf := new(bytes.Buffer)
-
-	err := json.NewEncoder(payloadBuf).Encode(message)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	resp, err := rc.http.Post(rc.hook, "application/json", payloadBuf)
+	resp, err := rc.http.Post(hook, "application/json", body)
 
 	if err != nil {
 		log.Println(err)
@@ -49,5 +46,31 @@ func (rc RocketChat) Send(message RocketChatMessage) error {
 	b, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	log.Printf("%s", b)
+
 	return nil
+
+}
+
+func New(RHook string, client RocketClientInterface) *RocketChat {
+	return &RocketChat{
+		hook:   RHook,
+		http:   &http.Client{},
+		client: client,
+	}
+}
+
+func NewClient() RocketClient {
+	return RocketClient{http: &http.Client{}}
+}
+
+func (rc RocketChat) Send(message RocketChatMessage) error {
+	payloadBuf := new(bytes.Buffer)
+
+	err := json.NewEncoder(payloadBuf).Encode(message)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return rc.client.Send(rc.hook, payloadBuf)
 }

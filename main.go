@@ -15,6 +15,7 @@ import (
 func main() {
 
 	err := godotenv.Load()
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -28,7 +29,7 @@ func main() {
 	notificationTargets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
 
 	notificationTargets.Register("slack", &Slack{sc: slack.New(os.Getenv("SLACK_HOOK"))})
-	notificationTargets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"))})
+	notificationTargets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"), rocketchat.NewClient())})
 
 	for _, project := range gitlabProjects {
 		for _, mr := range g.GetOldMergeRequests(project) {
