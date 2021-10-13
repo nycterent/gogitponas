@@ -28,7 +28,7 @@ func main() {
 
 	notificationTargets := registry.New(strings.Split(os.Getenv("NOTIFICATION_TARGETS"), ","))
 
-	notificationTargets.Register("slack", &Slack{sc: slack.New(os.Getenv("SLACK_HOOK"))})
+	notificationTargets.Register("slack", &Slack{sc: slack.New(os.Getenv("SLACK_HOOK"), slack.NewClient())})
 	notificationTargets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"), rocketchat.NewClient())})
 
 	for _, project := range gitlabProjects {

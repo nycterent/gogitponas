@@ -9,34 +9,40 @@ import (
 	"net/http"
 )
 
-type RocketChatMessage struct {
-	Text        string                        `json:"text"`
-	Attachments []RocketChatMessageAttachment `json:"attachments"`
+// ChatMessage json stuct for rocketchat message
+type ChatMessage struct {
+	Text        string                  `json:"text"`
+	Attachments []ChatMessageAttachment `json:"attachments"`
 }
 
-type RocketChatMessageAttachment struct {
+// ChatMessageAttachment json stuct for rocketchat message attachment
+type ChatMessageAttachment struct {
 	Title     string  `json:"title"`
 	TitleLink string  `json:"title_link"`
 	Text      string  `json:"text"`
-	ImageUrl  *string `json:"image_url"`
+	ImageURL  *string `json:"image_url"`
 	Color     *string `json:"color"`
 }
 
-type RocketChat struct {
+// Chat holds information about rocketchat setup
+type Chat struct {
 	hook   string
 	http   *http.Client
-	client RocketClientInterface
+	client ClientInterface
 }
 
-type RocketClientInterface interface {
+// ClientInterface represents Sending notification
+type ClientInterface interface {
 	Send(string, io.Reader) error
 }
 
-type RocketClient struct {
+// Client holds http client
+type Client struct {
 	http *http.Client
 }
 
-func (rc RocketClient) Send(hook string, body io.Reader) error {
+// Send sends the payload
+func (rc Client) Send(hook string, body io.Reader) error {
 
 	resp, err := rc.http.Post(hook, "application/json", body)
 
@@ -51,19 +57,22 @@ func (rc RocketClient) Send(hook string, body io.Reader) error {
 
 }
 
-func New(RHook string, client RocketClientInterface) *RocketChat {
-	return &RocketChat{
+// New constructs rocketchat.Chat
+func New(RHook string, client ClientInterface) *Chat {
+	return &Chat{
 		hook:   RHook,
 		http:   &http.Client{},
 		client: client,
 	}
 }
 
-func NewClient() RocketClient {
-	return RocketClient{http: &http.Client{}}
+// NewClient constructs rocketchat Client from  http
+func NewClient() Client {
+	return Client{http: &http.Client{}}
 }
 
-func (rc RocketChat) Send(message RocketChatMessage) error {
+// Send invokes the real sending client
+func (rc Chat) Send(message ChatMessage) error {
 	payloadBuf := new(bytes.Buffer)
 
 	err := json.NewEncoder(payloadBuf).Encode(message)
