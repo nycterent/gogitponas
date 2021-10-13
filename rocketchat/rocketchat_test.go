@@ -24,9 +24,9 @@ func TestSend(t *testing.T) {
 	rct := &RocketClientTest{}
 	var rocket = New("labashook", rct)
 
-	rocket.Send(RocketChatMessage{
+	rocket.Send(ChatMessage{
 		Text: "labas1",
-		Attachments: []RocketChatMessageAttachment{
+		Attachments: []ChatMessageAttachment{
 			{
 				Title:     "labas2",
 				TitleLink: "labas3",
@@ -34,8 +34,6 @@ func TestSend(t *testing.T) {
 			},
 		},
 	})
-
-	//	if bytes.Compare(rct.body, []byte(`{"text":"labas1","attachments":[{"title":"labas2","title_link":"labas3","text":"labas4","image_url":null,"color":null}]}`)) != 0 {
 
 	if string(rct.body[:len(rct.body)-1]) != `{"text":"labas1","attachments":[{"title":"labas2","title_link":"labas3","text":"labas4","image_url":null,"color":null}]}` {
 		t.Fatalf("%v", rct.body[:len(rct.body)-1])

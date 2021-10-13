@@ -14,14 +14,14 @@ var _ registry.Callback = (*Rocket)(nil)
 // and rocketchat client object
 type Rocket struct {
 	gmi gitlab.GitlabMergeInformation
-	rc  *rocketchat.RocketChat
+	rc  *rocketchat.Chat
 }
 
 // Send implements message sending for the RocketChat
 func (r Rocket) Send() {
-	err := r.rc.Send(rocketchat.RocketChatMessage{
+	err := r.rc.Send(rocketchat.ChatMessage{
 		Text: r.gmi.Title,
-		Attachments: []rocketchat.RocketChatMessageAttachment{
+		Attachments: []rocketchat.ChatMessageAttachment{
 			{
 				Title:     r.gmi.Reference,
 				TitleLink: r.gmi.MRURL,
