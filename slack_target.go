@@ -9,21 +9,21 @@ import (
 
 var _ registry.Callback = (*Slack)(nil)
 
-// Slack is stub for slack message and client
+// Slack is stub for slack client
 type Slack struct {
-	gmi gitlab.GitlabMergeInformation
-	sc  *slack.Slack
+	sc *slack.Slack
 }
 
 // Send implements sending message to slack
-func (s Slack) Send() {
+func (s Slack) Send(i interface{}) {
+	gmi := i.(gitlab.MergeInformation)
 	err := s.sc.Send(slack.Message{
-		Text: s.gmi.Title,
+		Text: gmi.Title,
 		Attachments: []slack.MessageAttachment{
 			{
-				Title:     s.gmi.Reference,
-				TitleLink: s.gmi.MRURL,
-				Text:      s.gmi.Author,
+				Title:     gmi.Reference,
+				TitleLink: gmi.MRURL,
+				Text:      gmi.Author,
 			},
 		},
 	})
@@ -32,9 +32,4 @@ func (s Slack) Send() {
 		log.Fatal(err)
 	}
 
-}
-
-// Set casts interface to slack message
-func (s *Slack) Set(i interface{}) {
-	s.gmi = i.(gitlab.GitlabMergeInformation)
 }

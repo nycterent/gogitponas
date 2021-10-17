@@ -7,6 +7,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// New constructor for gitlab
 func New(GitlabToken, GitlabURL string) *Gitlab {
 	client, err := gitlab.NewClient(GitlabToken, gitlab.WithBaseURL(GitlabURL+"/api/v4"))
 
@@ -21,14 +22,16 @@ func New(GitlabToken, GitlabURL string) *Gitlab {
 	return gl
 }
 
+// Gitlab starts a "class"
 type Gitlab struct {
 	git *gitlab.Client
 }
 
-func (gl Gitlab) GetOldMergeRequests(project string) (OldMerges []GitlabMergeInformation) {
+// GetOldMergeRequests method for getting old merge requests
+func (gl Gitlab) GetOldMergeRequests(project string) (OldMerges []MergeInformation) {
 
 	now := time.Now()
-	week_ago := now.AddDate(0, 0, 0)
+	weekAgo := now.AddDate(0, 0, 0)
 
 	git := gl.git
 
@@ -40,7 +43,7 @@ func (gl Gitlab) GetOldMergeRequests(project string) (OldMerges []GitlabMergeInf
 
 	opt := &gitlab.ListProjectMergeRequestsOptions{
 		State:         gitlab.String("opened"),
-		UpdatedBefore: &week_ago,
+		UpdatedBefore: &weekAgo,
 	}
 
 	mergeRequests, _, err := git.MergeRequests.ListProjectMergeRequests(gitlabProject.ID, opt)
@@ -59,7 +62,7 @@ func (gl Gitlab) GetOldMergeRequests(project string) (OldMerges []GitlabMergeInf
 			t, _ = time.Parse(layout, mr.UpdatedAt.String())
 		}
 
-		OldMerges = append(OldMerges, GitlabMergeInformation{
+		OldMerges = append(OldMerges, MergeInformation{
 			Title:     mr.Title,
 			Author:    mr.Author.Name,
 			Reference: mr.Reference,

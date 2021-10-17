@@ -9,13 +9,13 @@ import (
 	"net/http"
 )
 
-// ChatMessage json stuct for rocketchat message
+// ChatMessage json struct for rocketchat message
 type ChatMessage struct {
 	Text        string                  `json:"text"`
 	Attachments []ChatMessageAttachment `json:"attachments"`
 }
 
-// ChatMessageAttachment json stuct for rocketchat message attachment
+// ChatMessageAttachment json struct for rocketchat message attachment
 type ChatMessageAttachment struct {
 	Title     string  `json:"title"`
 	TitleLink string  `json:"title_link"`
@@ -24,11 +24,23 @@ type ChatMessageAttachment struct {
 	Color     *string `json:"color"`
 }
 
-// Chat holds information about rocketchat setup
+// Chat client serializer, kinda starts to define "class"
 type Chat struct {
 	hook   string
-	http   *http.Client
 	client ClientInterface
+}
+
+// Send encodes the payload and invokes real client.Send
+func (rc Chat) Send(message ChatMessage) error {
+	payloadBuf := new(bytes.Buffer)
+
+	err := json.NewEncoder(payloadBuf).Encode(message)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return rc.client.Send(rc.hook, payloadBuf)
 }
 
 // ClientInterface represents Sending notification
@@ -61,7 +73,6 @@ func (rc Client) Send(hook string, body io.Reader) error {
 func New(RHook string, client ClientInterface) *Chat {
 	return &Chat{
 		hook:   RHook,
-		http:   &http.Client{},
 		client: client,
 	}
 }
@@ -69,17 +80,4 @@ func New(RHook string, client ClientInterface) *Chat {
 // NewClient constructs rocketchat Client from  http
 func NewClient() Client {
 	return Client{http: &http.Client{}}
-}
-
-// Send invokes the real sending client
-func (rc Chat) Send(message ChatMessage) error {
-	payloadBuf := new(bytes.Buffer)
-
-	err := json.NewEncoder(payloadBuf).Encode(message)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return rc.client.Send(rc.hook, payloadBuf)
 }

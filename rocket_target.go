@@ -10,22 +10,21 @@ import (
 
 var _ registry.Callback = (*Rocket)(nil)
 
-// Rocket sets gmi for merge information
-// and rocketchat client object
+// Rocket sets rocketchat client object
 type Rocket struct {
-	gmi gitlab.GitlabMergeInformation
-	rc  *rocketchat.Chat
+	rc *rocketchat.Chat
 }
 
 // Send implements message sending for the RocketChat
-func (r Rocket) Send() {
+func (r Rocket) Send(i interface{}) {
+	gmi := i.(gitlab.MergeInformation)
 	err := r.rc.Send(rocketchat.ChatMessage{
-		Text: r.gmi.Title,
+		Text: gmi.Title,
 		Attachments: []rocketchat.ChatMessageAttachment{
 			{
-				Title:     r.gmi.Reference,
-				TitleLink: r.gmi.MRURL,
-				Text:      r.gmi.Author,
+				Title:     gmi.Reference,
+				TitleLink: gmi.MRURL,
+				Text:      gmi.Author,
 			},
 		},
 	})
@@ -34,9 +33,4 @@ func (r Rocket) Send() {
 		log.Fatal(err)
 	}
 
-}
-
-// Set casts gitlab merge inforfation to rocket
-func (r *Rocket) Set(i interface{}) {
-	r.gmi = i.(gitlab.GitlabMergeInformation)
 }
