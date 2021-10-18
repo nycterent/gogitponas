@@ -28,10 +28,10 @@ type Gitlab struct {
 }
 
 // GetOldMergeRequests method for getting old merge requests
-func (gl Gitlab) GetOldMergeRequests(project string) (OldMerges []MergeInformation) {
+func (gl Gitlab) GetOldMergeRequests(project string, days int) (OldMerges []MergeInformation) {
 
 	now := time.Now()
-	weekAgo := now.AddDate(0, 0, 0)
+	weekAgo := now.AddDate(0, 0, -days)
 
 	git := gl.git
 

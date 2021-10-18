@@ -7,6 +7,7 @@ import (
 	"gogitponas/slack"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -31,8 +32,14 @@ func main() {
 	notificationTargets.Register("slack", &Slack{sc: slack.New(os.Getenv("SLACK_HOOK"), slack.NewClient())})
 	notificationTargets.Register("rocket", &Rocket{rc: rocketchat.New(os.Getenv("ROCKET_HOOK"), rocketchat.NewClient())})
 
+	oldAgeDays, err := strconv.Atoi(os.Getenv("MR_OLD_AGE_DAYS"))
+
+	if err != nil {
+		log.Fatalf("Cannot convert days string to integer")
+	}
+
 	for _, project := range gitlabProjects {
-		for _, mr := range g.GetOldMergeRequests(project) {
+		for _, mr := range g.GetOldMergeRequests(project, oldAgeDays) {
 			notificationTargets.Send(mr)
 		}
 	}
