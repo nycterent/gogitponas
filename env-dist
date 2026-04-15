@@ -4,6 +4,6 @@ GITLAB_TOKEN=marmalasuogiene
 
 SLACK_HOOK=https://hooks.slack.com/services/etcetc
 
-ROCKET_HOOK=https://yourrocketchathook
+ROCKET_HOOK=https://your-server.rocket.chat/hooks/TOKEN_ID/TOKEN
 
 NOTIFICATION_TARGETS=rocket,slack

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gogitponas/gitlab"
 	"gogitponas/registry"
 	"gogitponas/rocketchat"
@@ -24,7 +25,7 @@ func (r Rocket) Send(i interface{}) {
 			{
 				Title:     gmi.Reference,
 				TitleLink: gmi.MRURL,
-				Text:      gmi.Author,
+				Text:      fmt.Sprintf("%s | Last updated: %s", gmi.Author, gmi.UpdatedAt),
 			},
 		},
 	})
